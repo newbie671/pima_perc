@@ -1,0 +1,41 @@
+1;
+source('./Confmat.mat');
+
+function [dIn, dOut, nData, weights] = pcn_init(in,out)
+    dIn = columns(in);
+    dOut = columns(out);
+    nData = rows(out);
+    weights = rand(dIn+1,dOut) * 0.1 - 0.05;
+endfunction
+
+function output = pcnfrwd(inputs, weights)
+    output = ((inputs * weights) > 0);
+endfunction
+
+function weights = pcntrain(inputs, targets, weights, eta, nIterations)
+    #add bias weights
+    columns(inputs);
+    inputs = [ones(rows(inputs),1),inputs];
+
+    #used to rearrange training examples
+    change = range(rows(inputs),1);
+    for n = 1:nIterations
+        outputs = pcnfrwd(inputs,weights);
+        weights += eta * (inputs' * (targets - outputs));
+
+        change = randperm(rows(inputs))';
+        inputs = inputs(change,:);
+        targets = targets(change,:);
+    endfor
+endfunction
+
+function [confusionMatrix, accuracy] = eval_perp(Data)
+    xTrain = Data(1:2:end,1:end-1);
+    xTest  = Data(2:2:end,1:end-1);
+    yTrain = Data(1:2:end,end);
+    yTest  = Data(2:2:end,end);
+
+    [_,_,_,weights] = pcn_init(xTrain,yTrain);
+    weights = pcntrain(xTrain, yTrain ,weights,0.25,100);
+    [confusionMatrix, accuracy] = Confmat(xTest, yTest, weights);
+endfunction

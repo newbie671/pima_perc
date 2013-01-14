@@ -1,0 +1,25 @@
+#! /usr/bin/octave -qf
+
+source('./Perceptron.mat');
+
+function bv = N2BitVector(n, nBits)
+    if 2 ** nBits < n
+        error("not enough bits for number");
+    endif
+    p2 = 2 .^ [0:nBits-1];
+    bv = repmat(n, 1, nBits);
+    bv = bitand(bv, p2) ~= 0;
+endfunction
+
+n = str2num(argv(){1});
+nBits = ceil(log2(n));
+
+data = ones(n + 1, nBits + 1);  #matrix to hold data
+for i = 0:n
+    temp = N2BitVector(i, nBits);
+    data(i+1,:) = [temp, sum(temp)];
+endfor
+
+[cm, acc] = eval_perp(data)
+
+pause();

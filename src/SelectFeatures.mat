@@ -1,6 +1,6 @@
 1;
 
-function SelectedIndices = SelectFeatures(Input, Target, EvaluationFunction, varargin)
+function SelectedIndices = SelectFeaturesUp(Input, Target, EvaluationFunction, varargin)
     M = size(Input, 2);             #number of dimensions
     ShuffIndices = randperm(M);
     SelectedIndices = ShuffIndices(1);

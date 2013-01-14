@@ -1,0 +1,12 @@
+1;
+
+function [cm,acc]= Confmat(x, y, weights) 
+    x = [ones(rows(x),1),x];
+    nY = max(y) + 1;
+    cm = zeros(nY, nY);
+    outputs = pcnfrwd(x, weights);
+    for i = 1:rows(x)
+        cm(y(i) + 1,outputs(i) + 1)++;
+    endfor
+    acc = sum(diag(cm)) / sum(cm(:));
+endfunction
