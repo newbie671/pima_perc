@@ -2,11 +2,13 @@
 
 function [cm,acc]= Confmat(x, y, weights) 
     x = [ones(rows(x),1),x];
-    nY = max(y) + 1;
+    nY = columns(y);
     cm = zeros(nY, nY);
     outputs = pcnfrwd(x, weights);
-    for i = 1:rows(x)
-        cm(y(i) + 1,outputs(i) + 1)++;
+    [_, outputs] = max(outputs, [], 2);
+    [_, y] = max(y, [], 2);
+    for i = 1:rows(y)
+        cm(y(i),outputs(i))++;
     endfor
     acc = sum(diag(cm)) / sum(cm(:));
 endfunction

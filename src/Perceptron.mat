@@ -8,8 +8,16 @@ function [dIn, dOut, nData, weights] = pcn_init(in,out)
     weights = rand(dIn+1,dOut) * 0.1 - 0.05;
 endfunction
 
+function s = sigmoid(inputs)
+    s = 1 ./ (1 + exp(-inputs));
+endfunction 
+
+function s = sigmoidd(inputs)
+    s = sigmoid(inputs) .* (1 - sigmoid(inputs));
+endfunction 
+
 function output = pcnfrwd(inputs, weights)
-    output = ((inputs * weights) > 0);
+    output = sigmoid(inputs * weights) ;
 endfunction
 
 function weights = pcntrain(inputs, targets, weights, eta, nIterations)
@@ -21,7 +29,8 @@ function weights = pcntrain(inputs, targets, weights, eta, nIterations)
     change = range(rows(inputs),1);
     for n = 1:nIterations
         outputs = pcnfrwd(inputs,weights);
-        weights += eta * (inputs' * (targets - outputs));
+
+        weights += eta * (inputs' * (sigmoidd(inputs * weights) .* (targets - outputs)));
 
         change = randperm(rows(inputs))';
         inputs = inputs(change,:);
@@ -29,11 +38,11 @@ function weights = pcntrain(inputs, targets, weights, eta, nIterations)
     endfor
 endfunction
 
-function [confusionMatrix, accuracy] = eval_perp(Data)
-    xTrain = Data(1:2:end,1:end-1);
-    xTest  = Data(2:2:end,1:end-1);
-    yTrain = Data(1:2:end,end);
-    yTest  = Data(2:2:end,end);
+function [confusionMatrix, accuracy] = eval_perp(Data, nInput = 1)
+    xTrain = Data(1:2:end,1:end-nInput);
+    xTest  = Data(2:2:end,1:end-nInput);
+    yTrain = Data(1:2:end,end-nInput+1:end);
+    yTest  = Data(2:2:end,end-nInput+1:end);
 
     [_,_,_,weights] = pcn_init(xTrain,yTrain);
     weights = pcntrain(xTrain, yTrain ,weights,0.25,100);

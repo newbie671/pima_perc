@@ -1,6 +1,7 @@
 #! /usr/bin/octave -qf
 
 source('./Perceptron.mat');
+source('./InputProcessing.mat');
 
 function bv = N2BitVector(n, nBits)
     if 2 ** nBits < n
@@ -17,9 +18,13 @@ nBits = ceil(log2(n));
 data = ones(n + 1, nBits + 1);  #matrix to hold data
 for i = 0:n
     temp = N2BitVector(i, nBits);
-    data(i+1,:) = [temp, sum(temp)];
+    data(i+1,:) = [temp, mod(sum(temp),2)];
 endfor
 
-[cm, acc] = eval_perp(data)
+data = [data(:,1:end-1), VectoriseInput(data(:,end))];
+
+for i = 1:10
+    [cm, acc] = eval_perp(data, 2)
+endfor
 
 pause();

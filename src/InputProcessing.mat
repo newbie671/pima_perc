@@ -1,0 +1,12 @@
+1;
+
+# Function that returns a matrix, where each row is a vector representing class membership.
+# A one in the nth element of a vector (indexed from 1) represents that element is a member of the nth class
+# Input is a column vector of integers representing the classes. It is assumed that classes exist from 0 to max of input vector
+function ClassVectors = VectoriseInput(Classes)
+    MaxClass = max(Classes);
+    ClassVectors = zeros(rows(Classes), MaxClass + 1); # + 1 because indexing from 1
+   
+    #set the corresponding row to one
+    ClassVectors(sub2ind(size(ClassVectors), 1:rows(Classes), Classes'+1)) = 1;
+endfunction
